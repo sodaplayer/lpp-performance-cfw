@@ -22,7 +22,7 @@ UNAME := $(shell uname)
 
 endif
 
-BUILDDIR = build
+BUILDDIR ?= build
 
 ifeq ($(UNAME), Linux)
 	UTIL_DIR := LP-Firmware-Utility
@@ -40,7 +40,7 @@ SOURCES += src/other/conversion.c src/other/tempo.c
 
 SOURCES += src/modes/mode.c
 SOURCES += src/modes/normal/performance.c src/modes/normal/ableton.c src/modes/normal/note.c src/modes/normal/drum.c src/modes/normal/fader.c src/modes/normal/programmer.c src/modes/normal/piano.c src/modes/normal/custom.c src/modes/normal/chord.c src/modes/normal/text.c
-SOURCES += src/modes/special/boot.c src/modes/special/setup.c src/modes/special/editor.c src/modes/special/scale.c src/modes/special/puyo.c src/modes/special/idle.c
+SOURCES += src/modes/special/boot.c src/modes/special/setup.c src/modes/special/editor.c src/modes/special/scale.c src/modes/special/puyo.c src/modes/special/gol.c src/modes/special/idle.c
 
 SOURCES += src/app.c
 
@@ -102,4 +102,4 @@ clean:
 update-submodule:
 	git submodule update --init --recursive
 
-.PHONY: update-submodule
+.PHONY: update-submodule clean

@@ -95,6 +95,7 @@ u8 setup_rainbow(u8 i, u8 c) {
 }
 
 const u8 konami[konami_length] = {91, 91, 92, 92, 93, 94, 93, 94};
+const u8 rev_konami[konami_length] = {94, 93, 94, 93, 92, 92, 91, 91};
 
 u8 setup_elapsed = setup_tick;
 u8 setup_mode_counter = 0;
@@ -395,7 +396,7 @@ void setup_surface_event(u8 p, u8 v, u8 x, u8 y) {
 
 		if (p == konami[konami_counter]) {
 			if (++konami_counter == konami_length) {
-				mode_update(mode_puyo);
+				mode_update(mode_gol);
 				setup_jump = 0;
 			}
 			rgb_led(p, konami_r, konami_g, konami_b);

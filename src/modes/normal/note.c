@@ -15,9 +15,13 @@
 #define note_color_transposed_g 0
 #define note_color_transposed_b 63
 
-#define note_color_white_r 0
+#define note_color_white_r 63
 #define note_color_white_g 41
 #define note_color_white_b 63
+
+#define note_color_trans_white_r 41
+#define note_color_trans_white_g 41
+#define note_color_trans_white_b 63
 
 #define note_color_black_r 0
 #define note_color_black_g 0
@@ -31,13 +35,27 @@
 #define note_color_scale_g 0
 #define note_color_scale_b 63
 
+#define note_color_fifth_r 10
+#define note_color_fifth_g 41
+#define note_color_fifth_b 63
+
+#define note_color_third_r 63
+#define note_color_third_g 41
+#define note_color_third_b 10
+
 #define note_color_pressed_r 0
 #define note_color_pressed_g 63
 #define note_color_pressed_b 0
 
+#define note_color_pressed_oct_r 10
+#define note_color_pressed_oct_g 20
+#define note_color_pressed_oct_b 0
+
 #define note_length 12
 #define note_segment 5
 
+// const u8 note_degree_colors[11][3] = {{63, 0, 63}, {20, 0, 63}, {0, 0, 63}, {0, 0, 31}, {0, 0, 7}, {0, 0, 31}, {0, 0, 63}, {20, 0, 63}, {40, 0, 63}, {63, 0, 63}};
+// 
 const u8 note_octave_colors[10][3] = {{63, 0, 63}, {20, 0, 63}, {0, 0, 63}, {0, 0, 31}, {0, 0, 7}, {0, 0, 31}, {0, 0, 63}, {20, 0, 63}, {40, 0, 63}, {63, 0, 63}};
 const u8 note_transpose_colors[13][3] = {{0, 7, 0}, {0, 21, 0}, {0, 31, 0}, {0, 42, 0}, {0, 52, 0}, {0, 63, 0}, {15, 63, 0}, {23, 63, 0}, {31, 63, 0}, {39, 63, 0}, {47, 63, 0}, {55, 63, 0}, {63, 63, 0}};
 
@@ -112,10 +130,10 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
 
 				} else {
 
-					if (settings.scale.note_translate) {
+					if (settings.scale.note_translate) { // Yellow Pad On
 						// Color notes in relation to SCALE, not absolute!
 						u8 local_m = modulo(12 + m - settings.scale.root, 12); // Move relative to root note
-						if (local_m == 0) {
+						if (local_m == 0) { // Base note
 							note_single(&p[0], l, note_color_base_r, note_color_base_g, note_color_base_b);
 						} else {
 							u8 out_of_scale = 1;
@@ -124,7 +142,17 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
 
 								if (local_m == s) {
 									// White note
-									note_single(&p[0], l, note_color_white_r, note_color_white_g, note_color_white_b);
+                                    switch (local_m) {
+                                       case 4:
+                                          note_single(&p[0], l, note_color_third_r, note_color_third_g, note_color_third_b);
+                                          break;
+                                       case 7:
+                                          note_single(&p[0], l, note_color_fifth_r, note_color_fifth_g, note_color_fifth_b);
+                                          break;
+                                       default: // White note
+                                          note_single(&p[0], l, note_color_trans_white_r, note_color_trans_white_g, note_color_trans_white_b);
+                                          break;
+                                    }
 									out_of_scale = 0;
 									break;
 
@@ -138,17 +166,23 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
 								note_single(&p[0], l, note_color_black_r, note_color_black_g, note_color_black_b);
 							}
 						}
-					} else {
+					} else { // Absolute Mode: Yellow Pad Off
 						// Previous mode, simple C major colors
 						switch (m) {
 							case 0: // C base note
 								note_single(&p[0], l, note_color_base_r, note_color_base_g, note_color_base_b);
 								break;
 
-							case 2:
 							case 4:
-							case 5:
+								note_single(&p[0], l, note_color_third_r, note_color_third_g, note_color_third_b);
+								break;
+
 							case 7:
+								note_single(&p[0], l, note_color_fifth_r, note_color_fifth_g, note_color_fifth_b);
+								break;
+
+							case 2:
+							case 5:
 							case 9:
 							case 11: // White note
 								note_single(&p[0], l, note_color_white_r, note_color_white_g, note_color_white_b);

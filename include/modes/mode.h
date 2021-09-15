@@ -50,8 +50,11 @@
 #define mode_boot 13
 #include "modes/special/boot.h"
 
-#define mode_puyo 14
-#include "modes/special/puyo.h"
+// #define mode_puyo 14
+// #include "modes/special/puyo.h"
+
+#define mode_gol 14
+#include "modes/special/gol.h"
 
 #define mode_idle 15
 #include "modes/special/idle.h"
