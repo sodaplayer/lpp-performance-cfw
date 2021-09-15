@@ -1,0 +1,13 @@
+diff --git a/tools/common/common.h b/tools/common/common.h
+index 4711b87..9efdda6 100644
+--- a/tools/common/common.h
++++ b/tools/common/common.h
+@@ -5,7 +5,7 @@
+ 
+ #include <cstdio>
+ #include <cstdlib>
+-#include <string>
++#include <cstring>
+ #include <vector>
+ 
+ typedef unsigned char byte;

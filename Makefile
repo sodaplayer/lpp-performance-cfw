@@ -18,11 +18,18 @@ define mkdir
 	mkdir -p "$(1)"
 endef
 
+UNAME := $(shell uname)
+
 endif
 
 BUILDDIR = build
 
-TOOLS = tools
+ifeq ($(UNAME), Linux)
+	UTIL_DIR := LP-Firmware-Utility
+	TOOLS := $(UTIL_DIR)/tools/out
+else
+	TOOLS := tools
+endif
 
 SOURCES += src/aftertouch/aftertouch.c
 SOURCES += src/flash/stm32f10x_imports.c src/flash/write.c src/flash/flash.c src/flash/settings.c
@@ -67,8 +74,12 @@ LDFLAGS += -T$(LDSCRIPT) -u _start -u _Minimum_Stack_Size  -mcpu=cortex-m3 -mthu
 
 all: $(SYX)
 
+$(BINTOSYX): update-submodule
+	cd $(UTIL_DIR) && git apply ../cstring.patch
+	cd $(UTIL_DIR) && $(MAKE) tools
+
 # build the final sysex file from the ELF - run the simulator first
-$(SYX): $(BIN)
+$(SYX): $(BIN) $(BINTOSYX)
 	./$(BINTOSYX) /pro 000 $(BIN) $(SYX)
 
 $(BIN): $(ELF)
@@ -87,3 +98,8 @@ $(BUILDDIR)/%.o: %.c
 
 clean:
 	$(call rmdir,$(BUILDDIR))
+
+update-submodule:
+	git submodule update --init --recursive
+
+.PHONY: update-submodule

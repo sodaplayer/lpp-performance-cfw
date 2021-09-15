@@ -1,0 +1,3 @@
+[submodule "LP-Firmware-Utility"]
+	path = LP-Firmware-Utility
+	url = https://github.com/mat1jaczyyy/LP-Firmware-Utility
