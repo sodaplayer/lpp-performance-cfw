@@ -395,7 +395,7 @@ void setup_surface_event(u8 p, u8 v, u8 x, u8 y) {
 
 		if (p == konami[konami_counter]) {
 			if (++konami_counter == konami_length) {
-				mode_update(mode_puyo);
+				mode_update(mode_gol);
 				setup_jump = 0;
 			}
 			rgb_led(p, konami_r, konami_g, konami_b);
