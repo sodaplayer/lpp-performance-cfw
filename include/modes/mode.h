@@ -56,12 +56,15 @@
 #define mode_idle 15
 #include "modes/special/idle.h"
 
-void (*const mode_init[16])();
-void (*const mode_timer_event[16])();
-void (*const mode_surface_event[16])(u8 p, u8 v, u8 x, u8 y);
-void (*const mode_midi_event[16])(u8 port, u8 t, u8 ch, u8 p, u8 v);
-void (*const mode_aftertouch_event[16])(u8 v);
-void (*const mode_poly_event[16])(u8 p, u8 v);
+#define mode_gol 16
+#include "modes/special/gol.h"
+
+void (*const mode_init[17])();
+void (*const mode_timer_event[17])();
+void (*const mode_surface_event[17])(u8 p, u8 v, u8 x, u8 y);
+void (*const mode_midi_event[17])(u8 port, u8 t, u8 ch, u8 p, u8 v);
+void (*const mode_aftertouch_event[17])(u8 v);
+void (*const mode_poly_event[17])(u8 p, u8 v);
 
 u8 mode, mode_default;
 

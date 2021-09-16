@@ -1,7 +1,7 @@
 #include "modes/mode.h"
 
 // Arrays of function pointers. Used to programmatically call the correct mode's function
-void (*const mode_init[16])() = {
+void (*const mode_init[17])() = {
 	performance_init,
 	ableton_init,
 	note_init,
@@ -17,9 +17,10 @@ void (*const mode_init[16])() = {
 	setup_init,
 	boot_init,
 	puyo_init,
-	idle_init
+	idle_init,
+	gol_init
 };
-void (*const mode_timer_event[16])() = {
+void (*const mode_timer_event[17])() = {
 	performance_timer_event,
 	ableton_timer_event,
 	note_timer_event,
@@ -35,9 +36,10 @@ void (*const mode_timer_event[16])() = {
 	setup_timer_event,
 	boot_timer_event,
 	puyo_timer_event,
-	idle_timer_event
+	idle_timer_event,
+	gol_timer_event
 };
-void (*const mode_surface_event[16])(u8 p, u8 v, u8 x, u8 y) = {
+void (*const mode_surface_event[17])(u8 p, u8 v, u8 x, u8 y) = {
 	performance_surface_event,
 	ableton_surface_event,
 	note_surface_event,
@@ -53,9 +55,10 @@ void (*const mode_surface_event[16])(u8 p, u8 v, u8 x, u8 y) = {
 	setup_surface_event,
 	boot_surface_event,
 	puyo_surface_event,
-	idle_surface_event
+	idle_surface_event,
+	gol_surface_event
 };
-void (*const mode_midi_event[16])(u8 port, u8 t, u8 ch, u8 p, u8 v) = {
+void (*const mode_midi_event[17])(u8 port, u8 t, u8 ch, u8 p, u8 v) = {
 	performance_midi_event,
 	ableton_midi_event,
 	note_midi_event,
@@ -71,9 +74,10 @@ void (*const mode_midi_event[16])(u8 port, u8 t, u8 ch, u8 p, u8 v) = {
 	setup_midi_event,
 	boot_midi_event,
 	puyo_midi_event,
-	idle_midi_event
+	idle_midi_event,
+	gol_midi_event
 };
-void (*const mode_aftertouch_event[16])(u8 v) = {
+void (*const mode_aftertouch_event[17])(u8 v) = {
 	performance_aftertouch_event,
 	ableton_aftertouch_event,
 	note_aftertouch_event,
@@ -89,9 +93,10 @@ void (*const mode_aftertouch_event[16])(u8 v) = {
 	setup_aftertouch_event,
 	boot_aftertouch_event,
 	puyo_aftertouch_event,
-	idle_aftertouch_event
+	idle_aftertouch_event,
+	gol_aftertouch_event
 };
-void (*const mode_poly_event[16])(u8 p, u8 v) = {
+void (*const mode_poly_event[17])(u8 p, u8 v) = {
 	performance_poly_event,
 	ableton_poly_event,
 	note_poly_event,
@@ -107,7 +112,8 @@ void (*const mode_poly_event[16])(u8 p, u8 v) = {
 	setup_poly_event,
 	boot_poly_event,
 	puyo_poly_event,
-	idle_poly_event
+	idle_poly_event,
+	gol_poly_event
 };
 
 u8 mode = 0;

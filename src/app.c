@@ -48,8 +48,8 @@ void app_timer_event() {
 	global_timer++;
 
 	if (settings.idle_enabled && mode < mode_normal - 1 && idle_time <= global_timer) {
-		idle_return = mode;
-		mode_update(mode_idle);
+	    idle_return = mode;
+		mode_update(mode_gol);
 	}
 
 	tempo_timer++; tempo_tick();
