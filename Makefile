@@ -21,7 +21,7 @@ define mkdir
 endef
 
 UNAME := $(shell uname)
-OCIRUNTIME = docker
+OCIRUNTIME = podman
 
 endif
 

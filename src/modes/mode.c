@@ -110,8 +110,8 @@ void (*const mode_poly_event[16])(u8 p, u8 v) = {
 	idle_poly_event
 };
 
-u8 mode = 0;
-u8 mode_default = 0;
+u8 mode = 2;
+u8 mode_default = 2;
 
 void mode_refresh() {
 	clear_led();

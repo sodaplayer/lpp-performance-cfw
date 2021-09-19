@@ -72,7 +72,7 @@ void boot_timer_event() {
 	
 	if (++boot_fade_elapsed >= boot_fade_tick) { // Redraw fades
 		if (boot_note_floor == boot_note_length) { // Enter Performance mode (end condition)
-			mode_update(mode_performance);
+			mode_update(mode_note);
 		
 		} else {
 			for (u8 i = boot_note_floor; i < boot_note_ceil; i++) {
@@ -97,7 +97,7 @@ void boot_timer_event() {
 }
 
 void boot_surface_event(u8 p, u8 v, u8 x, u8 y) {
-	if (p == 0 && v != 0) mode_update(mode_performance); // Manually interrupt boot animation
+	if (p == 0 && v != 0) mode_update(mode_note); // Manually interrupt boot animation
 }
 
 void boot_midi_event(u8 port, u8 t, u8 ch, u8 p, u8 v) {}
