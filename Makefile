@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean flash
 
 ifeq ($(OS),Windows_NT)
 

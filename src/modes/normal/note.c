@@ -1,71 +1,147 @@
 #include "modes/normal/note.h"
+#include "note_defs.h"
 
 #define note_octave_start 3
 #define note_transpose_start 0
 
-#define note_color_invalid_r 7
-#define note_color_invalid_g 0
-#define note_color_invalid_b 0
+#define note_color_invalid_r 0x07
+#define note_color_invalid_g 0x00
+#define note_color_invalid_b 0x00
 
-#define note_color_base_r 63
-#define note_color_base_g 0
-#define note_color_base_b 63
+#define note_color_base_r 0x3f
+#define note_color_base_g 0x00
+#define note_color_base_b 0x3f
 
-#define note_color_transposed_r 20
-#define note_color_transposed_g 0
-#define note_color_transposed_b 63
+#define note_color_transposed_r 0x14
+#define note_color_transposed_g 0x00
+#define note_color_transposed_b 0x3f
 
-#define note_color_white_r 63
-#define note_color_white_g 41
-#define note_color_white_b 63
+#define note_color_white_r 0x3f
+#define note_color_white_g 0x29
+#define note_color_white_b 0x3f
 
-#define note_color_trans_white_r 41
-#define note_color_trans_white_g 41
-#define note_color_trans_white_b 63
+#define note_color_trans_white_r 0x29
+#define note_color_trans_white_g 0x29
+#define note_color_trans_white_b 0x3f
 
-#define note_color_black_r 0
-#define note_color_black_g 0
-#define note_color_black_b 0
+#define note_color_scale_base_r 0x14
+#define note_color_scale_base_g 0x00
+#define note_color_scale_base_b 0x3f
 
-#define note_color_scale_base_r 20
-#define note_color_scale_base_g 0
-#define note_color_scale_base_b 63
+#define note_color_scale_r 0x3f
+#define note_color_scale_g 0x00
+#define note_color_scale_b 0x3f
 
-#define note_color_scale_r 63
-#define note_color_scale_g 0
-#define note_color_scale_b 63
+#define note_color_pressed_r 0x00
+#define note_color_pressed_g 0x3f
+#define note_color_pressed_b 0x00
 
-#define note_color_fifth_r 10
-#define note_color_fifth_g 41
-#define note_color_fifth_b 63
-
-#define note_color_third_r 63
-#define note_color_third_g 41
-#define note_color_third_b 10
-
-#define note_color_m_third_r 12
-#define note_color_m_third_g 8
-#define note_color_m_third_b 2
-
-#define note_color_pressed_r 0
-#define note_color_pressed_g 63
-#define note_color_pressed_b 0
-
-#define note_color_pressed_oct_r 10
-#define note_color_pressed_oct_g 20
-#define note_color_pressed_oct_b 0
+#define note_color_pressed_oct_r 0x0a
+#define note_color_pressed_oct_g 0x14
+#define note_color_pressed_oct_b 0x00
 
 #define note_length 12
 #define note_segment 5
 
-// const u8 note_degree_colors[11][3] = {{63, 0, 63}, {20, 0, 63}, {0, 0, 63}, {0, 0, 31}, {0, 0, 7}, {0, 0, 31}, {0, 0, 63}, {20, 0, 63}, {40, 0, 63}, {63, 0, 63}};
-const u8 note_octave_colors[10][3] = {{63, 0, 63}, {20, 0, 63}, {0, 31, 63}, {0, 0, 31}, {0, 0, 7}, {0, 0, 31}, {0, 31, 63}, {20, 0, 63}, {40, 0, 63}, {63, 0, 63}};
-const u8 note_transpose_colors[13][3] = {{0, 7, 0}, {0, 21, 0}, {0, 31, 0}, {0, 42, 0}, {0, 52, 0}, {0, 63, 0}, {15, 63, 0}, {23, 63, 0}, {31, 63, 0}, {39, 63, 0}, {47, 63, 0}, {55, 63, 0}, {63, 63, 0}};
+#define note_color_white {0x29, 0x29, 0x3f}
+#define note_color_black {0x00, 0x00, 0x00}
+
+const u8 note_pitchclass_colors[12][3] = {
+    {0x37, 0x00, 0x09},
+    {0x37, 0x04, 0x00},
+    {0x2b, 0x18, 0x00},
+    {0x24, 0x1c, 0x00},
+    {0x1b, 0x20, 0x00},
+    {0x00, 0x23, 0x10},
+    {0x00, 0x22, 0x1e},
+    {0x00, 0x21, 0x25},
+    {0x00, 0x1f, 0x2e},
+    {0x11, 0x17, 0x3f},
+    {0x25, 0x09, 0x3f},
+    {0x2c, 0x00, 0x38}
+};
+
+const u8 note_scale_colors[12][3] = {
+    {0x37, 0x00, 0x09}, // unison / octave
+    {0x37, 0x04, 0x00}, // minor second
+    {0x2b, 0x18, 0x00}, // major second
+    {0x24, 0x1c, 0x00}, // minor third
+    {0x1b, 0x20, 0x00}, // major third
+    {0x00, 0x23, 0x10}, // perfect fourth
+    {0x00, 0x22, 0x1e}, // tritone
+    {0x00, 0x21, 0x25}, // perfect fifth
+    {0x00, 0x1f, 0x2e}, // minor sixth
+    {0x11, 0x17, 0x3f}, // major sixth
+    {0x25, 0x09, 0x3f}, // minor seventh
+    {0x2c, 0x00, 0x38}  // major seventh
+};
+
+const u8 note_accidental_colors[12][3] = {
+    {0x1f, 0x00, 0x1f}, // unison / octave
+    note_color_black, // minor second
+    note_color_black, // major second
+    {0x04, 0x03, 0x00}, // minor third
+    {0x3f, 0x29, 0x0a}, // major third
+    note_color_black, // perfect fourth
+    note_color_black, // tritone
+    {0x0a, 0x29, 0x3f}, // perfect fifth
+    note_color_black, // minor sixth
+    note_color_black, // major sixth
+    note_color_black, // minor seventh
+    note_color_black // major seventh
+};
+
+const u8 note_cmajor_colors[12][3] = {
+    {0x37, 0x00, 0x09}, // unison / octave
+    note_color_black,   // minor second
+    note_color_white,   // major second
+    {0x04, 0x03, 0x00}, // minor third
+    {0x1b, 0x20, 0x00}, // major third
+    note_color_white,   // perfect fourth
+    note_color_black,   // tritone
+    {0x00, 0x21, 0x25}, // perfect fifth
+    note_color_black,   // minor sixth
+    note_color_white,   // major sixth
+    note_color_black,   // minor seventh
+    note_color_white    // major seventh
+};
+
+const u8 note_octave_colors[10][3] = {
+    {0x3f, 0x00, 0x3f},
+    {0x14, 0x00, 0x3f},
+    {0x00, 0x1f, 0x3f},
+    {0x00, 0x00, 0x1f},
+    {0x00, 0x00, 0x07},
+    {0x00, 0x00, 0x1f},
+    {0x00, 0x1f, 0x3f},
+    {0x14, 0x00, 0x3f},
+    {0x28, 0x00, 0x3f},
+    {0x3f, 0x00, 0x3f}
+};
+const u8 note_transpose_colors[13][3] = {
+    {0x00, 0x07, 0x00},
+    {0x00, 0x15, 0x00},
+    {0x00, 0x1f, 0x00},
+    {0x00, 0x2a, 0x00},
+    {0x00, 0x34, 0x00},
+    {0x00, 0x3f, 0x00},
+    {0x0f, 0x3f, 0x00},
+    {0x17, 0x3f, 0x00},
+    {0x1f, 0x3f, 0x00},
+    {0x27, 0x3f, 0x00},
+    {0x2f, 0x3f, 0x00},
+    {0x37, 0x3f, 0x00},
+    {0x3f, 0x3f, 0x00}
+};
 
 s8 note_octave = 5;
 s8 note_transpose = note_transpose_start;
 
 u8 note_shift = 0;
+u8 note_program_shift = 0;
+u8 note_bank_shift = 0;
+u8 note_root_shift = 0;
+
 u8 note_nav_pressed[4] = {};
 
 u8 note_channel() {
@@ -137,28 +213,14 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                         // Color notes in relation to SCALE, not absolute!
                         u8 local_m = modulo(12 + m - settings.scale.root, 12); // Move relative to root note
                         if (local_m == 0) { // Base note
-                            note_single(&p[0], l, note_color_base_r, note_color_base_g, note_color_base_b);
+                            note_single(&p[0], l, note_scale_colors[local_m][0], note_scale_colors[local_m][1], note_scale_colors[local_m][2]);
                         } else {
                             u8 out_of_scale = 1;
                             for (u8 i = 0; i < scales_length(settings.scale.selected); i++) {
                                 u8 s = scales(settings.scale.selected, i);
 
                                 if (local_m == s) {
-                                    // White note
-                                    switch (local_m) {
-                                        case 3:
-                                            note_single(&p[0], l, note_color_m_third_r, note_color_m_third_g, note_color_m_third_b);
-                                            break;
-                                        case 4:
-                                            note_single(&p[0], l, note_color_third_r, note_color_third_g, note_color_third_b);
-                                            break;
-                                        case 7:
-                                            note_single(&p[0], l, note_color_fifth_r, note_color_fifth_g, note_color_fifth_b);
-                                            break;
-                                        default: // White note
-                                            note_single(&p[0], l, note_color_trans_white_r, note_color_trans_white_g, note_color_trans_white_b);
-                                            break;
-                                    }
+                                    note_single(&p[0], l, note_scale_colors[local_m][0], note_scale_colors[local_m][1], note_scale_colors[local_m][2]);
                                     out_of_scale = 0;
                                     break;
 
@@ -168,50 +230,16 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                             }
 
                             if (out_of_scale) {
-                                // Black note
-                                switch (local_m) {
-                                    case 3:
-                                        note_single(&p[0], l, note_color_m_third_r, note_color_m_third_g, note_color_m_third_b);
-                                        break;
-                                    default:
-                                        note_single(&p[0], l, note_color_black_r, note_color_black_g, note_color_black_b);
-                                        break;
-                                }
+                                note_single(&p[0], l, note_accidental_colors[local_m][0], note_accidental_colors[local_m][1], note_accidental_colors[local_m][2]);
                             }
                         }
                     } else { // Absolute Mode: Yellow Pad Off
                         // Previous mode, simple C major colors
-                        switch (m) {
-                            case 0: // C base note
-                                note_single(&p[0], l, note_color_base_r, note_color_base_g, note_color_base_b);
-                                break;
-                            case 3:
-                                note_single(&p[0], l, note_color_m_third_r, note_color_m_third_g, note_color_m_third_b);
-                                break;
-
-                            case 4:
-                                note_single(&p[0], l, note_color_third_r, note_color_third_g, note_color_third_b);
-                                break;
-
-                            case 7:
-                                note_single(&p[0], l, note_color_fifth_r, note_color_fifth_g, note_color_fifth_b);
-                                break;
-
-                            case 2:
-                            case 5:
-                            case 9:
-                            case 11: // White note
-                                note_single(&p[0], l, note_color_white_r, note_color_white_g, note_color_white_b);
-                                break;
-
-                            default: // Black note
-                                note_single(&p[0], l, note_color_black_r, note_color_black_g, note_color_black_b);
-                                break;
-                        }
+                        note_single(&p[0], l, note_cmajor_colors[m][0], note_cmajor_colors[m][1], note_cmajor_colors[m][2]);
                     }
 
-                    u8 b = modulo(note_transpose, length); // Base note of scale
-                    if (b != 0 && b == m) note_single(&p[0], l, note_color_transposed_r, note_color_transposed_g, note_color_transposed_b); // Scale base note
+                    // u8 b = modulo(note_transpose, length); // Base note of scale
+                    // if (b != 0 && b == m) note_single(&p[0], l, note_color_transposed_r, note_color_transposed_g, note_color_transposed_b); // Scale base note
                 }
 
             } else { // Note pressed
@@ -225,6 +253,62 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
     }
 
     return n;
+}
+
+void note_draw_transpose_view() {
+    u8 root = modulo((settings.scale.note_translate ? settings.scale.root : 0) + note_transpose, 12);
+
+    u8 r = note_pitchclass_colors[root][0];
+    u8 g = note_pitchclass_colors[root][1];
+    u8 b = note_pitchclass_colors[root][2];
+
+    for (u8 i = 0; i < 8; i++) {
+        rgb_led(i + 1, 0, 0, 0);
+    }
+
+    switch(root) {
+        case 0: // C
+            rgb_led(1, r, g, b);
+            break;
+        case 1: // C#
+            rgb_led(1, r, g, b);
+            rgb_led(2, r, g, b);
+            break;
+        case 2: // D
+            rgb_led(2, r, g, b);
+            break;
+        case 3: // D#
+            rgb_led(2, r, g, b);
+            rgb_led(3, r, g, b);
+            break;
+        case 4: // E
+            rgb_led(3, r, g, b);
+            break;
+        case 5: // F
+            rgb_led(4, r, g, b);
+            break;
+        case 6: // F#
+            rgb_led(4, r, g, b);
+            rgb_led(5, r, g, b);
+            break;
+        case 7: // G
+            rgb_led(5, r, g, b);
+            break;
+        case 8: // G#
+            rgb_led(5, r, g, b);
+            rgb_led(6, r, g, b);
+            break;
+        case 9: // A
+            rgb_led(6, r, g, b);
+            break;
+        case 10: // A#
+            rgb_led(6, r, g, b);
+            rgb_led(7, r, g, b);
+            break;
+        case 11: // B
+            rgb_led(7, r, g, b);
+            break;
+    }
 }
 
 void note_draw_navigation() {
@@ -252,18 +336,38 @@ void note_draw_navigation() {
     }
 }
 
+void note_root_button() {
+    if (note_root_shift) { // root button pressed
+        rgb_led(B_STOP, 63, 63, 0);
+    } else { // root button released
+        rgb_led(B_STOP, 7, 7, 0);
+    }
+
+    note_draw_transpose_view();
+}
+
 void note_scale_button() {
     if (note_shift) { // Shift button pressed
-        rgb_led(80, 63, 63, 63);
-        rgb_led(96, 7, 7, 7);
+        rgb_led(B_SHIFT, 63, 63, 63);
+        rgb_led(B_NOTE, 7, 7, 7);
 
     } else { // Shift button released
-        rgb_led(80, 7, 7, 7);
+        rgb_led(B_SHIFT, 7, 7, 7);
 
         if (mode_default == mode_ableton) {
-            rgb_led(96, 0, 63, 63);
+            rgb_led(B_NOTE, 0, 63, 63);
         } else if (mode_default == mode_note) {
-            rgb_led(96, 0, 0, 0);
+            if (settings.scale.note_translate) {
+                u8 root = modulo(note_transpose + settings.scale.root, 12);
+
+                u8 r = note_pitchclass_colors[root][0];
+                u8 g = note_pitchclass_colors[root][1];
+                u8 b = note_pitchclass_colors[root][2];
+
+                rgb_led(B_NOTE, r, g, b);
+            } else {
+                rgb_led(B_NOTE, 0, 0, 0);
+            }
         }
     }
 
@@ -300,56 +404,58 @@ void note_surface_event(u8 p, u8 v, u8 x, u8 y) {
     if (p == 0) { // Enter Setup mode
         if (v != 0) mode_update(mode_setup);
 
-    } else if (p == 96 && note_shift && v != 0) { // Shift+Note button
+    } else if (p == B_NOTE && note_shift && v != 0) { // Shift+Note button
         mode_update(mode_scale_setup); // Enter Setup for Scale mode
         rgb_led(p, 63, 63, 63);
-
-    } else if (p == 96 && v == 0) {
+    } else if (p == B_NOTE && v == 0) {
         note_scale_button();
-
-    } else if (x == 0 || y == 9 || (x == 9 && y > 4)) { // Unused side buttons
+    } else if (y == 9 || (x == 9 && y > 4)) { // Unused side buttons
         // send_midi(2 - mode_default, 0xB0 | note_channel(), p, v);
-        rgb_led(p, 0, (v == 0)? 0 : 63, 0);
+        rgb_led(p, 0, (v == 0) ? 0 : 63, 0);
     } else if (y == 0 && x < 8) { // Left Mod Wheel
         if (note_shift) {
-            send_midi(2 - mode_default, 0xB0 | note_channel(), 1, (x - 1) * 18);
+            send_midi(2 - mode_default, MD_CC | note_channel(), 1, (x - 1) * 18);
             rgb_led(p, 0, (v == 0)? 0 : x * 8 - 8, 0);
         } else {
-            send_midi(2 - mode_default, 0xB0 | note_channel(), 1, ((x - 1) - 3) * 18);
+            send_midi(2 - mode_default, MD_CC | note_channel(), 1, ((x - 1) - 3) * 18);
             rgb_led(p, (v == 0)? 0 : x * 8 - 8, 0, 0);
         }
-    } else if (p == 80) { // Shift button
-        send_midi(2 - mode_default, 0xB0 | note_channel(), p, v);
+    } else if (p == B_SHIFT) { // Shift button
+        // send_midi(2 - mode_default, MD_CC | note_channel(), p, v);
         note_shift = v;
         note_scale_button();
-
+    } else if (p == B_STOP) { // Root Shift
+        note_root_shift = v;
+        note_root_button();
+    } else if (x == 0 && y < 8 && note_root_shift && v != 0) { // Scale Buttons
+        note_root_button();
     } else if (x == 9 && y < 5) { // Navigation buttons
         if (v != 0) {
             if (settings.scale.enabled && note_shift) {
                 switch (p) {
-                    case 93: // Segment down
+                    case B_LEFT: // Segment down
                         if (settings.scale.segment > 1) settings.scale.segment--;
                         break;
 
-                    case 94: // Segment up
+                    case B_RIGHT: // Segment up
                         if (settings.scale.segment < 8) settings.scale.segment++;
                         break;
                 }
             } else {
                 switch (p) {
-                    case 91: // Octave up
+                    case B_UP: // Octave up
                         if (note_octave < 8) note_octave++;
                         break;
 
-                    case 92: // Octave down
+                    case B_DOWN: // Octave down
                         if (note_octave > -1) note_octave--;
                         break;
 
-                    case 93: // Transpose down
+                    case B_LEFT: // Transpose down
                         if (note_transpose > -12) note_transpose--;
                         break;
 
-                    case 94: // Transpose up
+                    case B_RIGHT: // Transpose up
                         if (note_transpose < 12) note_transpose++;
                         break;
                 }
@@ -365,10 +471,11 @@ void note_surface_event(u8 p, u8 v, u8 x, u8 y) {
         }
 
         note_draw();
+        note_draw_transpose_view();
 
     } else { // Main grid
         s8 n = note_press(x, y, v, -1);
-        if (n >= 0) send_midi(2 - mode_default, (v? 0x90 : 0x80) | note_channel(), n, v);
+        if (n >= 0) send_midi(2 - mode_default, (v ? MD_ON : MD_OFF) | note_channel(), n, v);
     }
 }
 
@@ -399,10 +506,10 @@ void note_midi_event(u8 port, u8 t, u8 ch, u8 p, u8 v) {
 }
 
 void note_aftertouch_event(u8 v) {
-    aftertouch_send(USBSTANDALONE, 0xD0 | note_channel(), v);
+    aftertouch_send(USBSTANDALONE, MD_CH_AT | note_channel(), v);
 }
 
 void note_poly_event(u8 p, u8 v) {
     s8 n = note_press(p / 10, p % 10, v, -1);
-    if (n >= 0) send_midi(USBSTANDALONE, 0xA0 | note_channel(), n, v);
+    if (n >= 0) send_midi(USBSTANDALONE, MD_POLY_AT | note_channel(), n, v);
 }
