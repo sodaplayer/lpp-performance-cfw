@@ -37,13 +37,23 @@ const u8 scale_data[186] = {
 };
 const u8 scale_keys[12] = {51, 62, 52, 63, 53, 54, 65, 55, 66, 56, 67, 57};
 
+const u8 scale_colors[12][3] = {
+    {0x37, 0x00, 0x09},
+    {0x2b, 0x18, 0x00},
+    {0x1b, 0x20, 0x00},
+    {0x00, 0x23, 0x10},
+    {0x00, 0x21, 0x25},
+    {0x11, 0x17, 0x3f},
+    {0x2c, 0x00, 0x38}
+};
+
 u8 scales(u8 s, u8 i) {
     if (i == 0) return 0;
     return scale_data[scale_points[s] + i - 1];
 }
 
 u8 scales_length(u8 s) {
-    return scale_points[s + 1] - scale_points[s] + 1; 
+    return scale_points[s + 1] - scale_points[s] + 1;
 }
 
 #define scale_setup_color_enabled_r 20
@@ -66,9 +76,9 @@ u8 scales_length(u8 s) {
 #define scale_setup_color_root_g 0
 #define scale_setup_color_root_b 63
 
-#define scale_setup_color_scale_r 63 >> 4
+#define scale_setup_color_scale_r 63 >> 3
 #define scale_setup_color_scale_g 0
-#define scale_setup_color_scale_b 63 >> 4
+#define scale_setup_color_scale_b 63 >> 3
 
 #define scale_setup_color_selected_r 20
 #define scale_setup_color_selected_g 0
@@ -121,60 +131,22 @@ void scale_setup_init() {
             u8 p = x * 10 + y;
             u8 scale = (x - 1) * 8 + (y - 1);
             // Select scale
-            switch (scale) {
-                case 25: // Ionian
-                    rgb_led(p, 0x37 >> 4, 0x00 >> 4, 0x09 >> 4);
-                    break;
-                case 26: // Dorian
-                    rgb_led(p, 0x2b >> 4, 0x18 >> 4, 0x00 >> 4);
-                    break;
-                case 27: // Phrygian
-                    rgb_led(p, 0x1b >> 4, 0x20 >> 4, 0x00 >> 4);
-                    break;
-                case 28: // Lydian
-                    rgb_led(p, 0x00 >> 4, 0x23 >> 4, 0x10 >> 4);
-                    break;
-                case 29: // Mixolydian
-                    rgb_led(p, 0x00 >> 4, 0x21 >> 4, 0x25 >> 4);
-                    break;
-                case 30: // Aeolian
-                    rgb_led(p, 0x11 >> 4, 0x17 >> 4, 0x3f >> 4);
-                    break;
-                case 31: // Locrian
-                    rgb_led(p, 0x2c >> 4, 0x00 >> 4, 0x38 >> 4);
-                    break;
-                default:
-                    rgb_led(p, scale_setup_color_scale_r, scale_setup_color_scale_g, scale_setup_color_scale_b); // Select scale
+            if (scale >= 24 && scale <= 30) {
+                rgb_led(p, scale_colors[scale-24][0] >> 2, scale_colors[scale-24][1] >> 2, scale_colors[scale-24][2] >> 2);
+            } else {
+                rgb_led(p, scale_setup_color_scale_r, scale_setup_color_scale_g, scale_setup_color_scale_b); // Select scale
             }
         }
     }
 
     u8 p = ((settings.scale.selected >> 3) + 1) * 10 + (settings.scale.selected % 8) + 1;
-    // Select scale
-    switch (settings.scale.selected) {
-        case 25: // Ionian
-            rgb_led(p, 0x37, 0x00, 0x09);
-            break;
-        case 26: // Dorian
-            rgb_led(p, 0x2b, 0x18, 0x00);
-            break;
-        case 27: // Phrygian
-            rgb_led(p, 0x1b, 0x20, 0x00);
-            break;
-        case 28: // Lydian
-            rgb_led(p, 0x00, 0x23, 0x10);
-            break;
-        case 29: // Mixolydian
-            rgb_led(p, 0x00, 0x21, 0x25);
-            break;
-        case 30: // Aeolian
-            rgb_led(p, 0x11, 0x17, 0x3f);
-            break;
-        case 31: // Locrian
-            rgb_led(p, 0x2c, 0x00, 0x38);
-            break;
-        default:
-            rgb_led(p, scale_setup_color_selected_r, scale_setup_color_selected_g, scale_setup_color_selected_b); // Selected scale
+
+    // Selected scale
+    u8 scale_offset = settings.scale.selected - 24;
+    if (settings.scale.selected >= 24 && settings.scale.selected <= 30) {
+        rgb_led(p, scale_colors[scale_offset][0], scale_colors[scale_offset][1], scale_colors[scale_offset][2]);
+    } else {
+        rgb_led(p, scale_setup_color_selected_r, scale_setup_color_selected_g, scale_setup_color_selected_b); // Selected scale
     }
 }
 

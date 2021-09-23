@@ -121,6 +121,16 @@ const u8 note_cmajor_colors[12][3] = {
     note_color_white    // major seventh
 };
 
+const u8* major_colors[12] = {
+    &note_scale_colors[0],
+    &note_scale_colors[2],
+    &note_scale_colors[4],
+    &note_scale_colors[5],
+    &note_scale_colors[7],
+    &note_scale_colors[9],
+    &note_scale_colors[11]
+};
+
 const u8 note_octave_colors[10][3] = {
     {0x3f, 0x00, 0x3f},
     {0x14, 0x00, 0x3f},
@@ -408,23 +418,24 @@ void note_scale_button() {
         rgb_led(B_SHIFT, 63, 63, 63);
         rgb_led(B_NOTE, 7, 7, 7);
 
+        for (u8 i = 0; i < 7; i++) {
+            rgb_led(i + 1, major_colors[i][0] >> 2, major_colors[i][1] >> 2, major_colors[i][2] >> 2);
+        }
+
     } else { // Shift button released
         rgb_led(B_SHIFT, 7, 7, 7);
+        note_draw_transpose_view();
 
         if (mode_default == mode_ableton) {
             rgb_led(B_NOTE, 0, 63, 63);
         } else if (mode_default == mode_note) {
-            if (settings.scale.note_translate) {
-                u8 root = modulo(note_transpose + settings.scale.root, 12);
+            u8 root = modulo(note_transpose + settings.scale.root, 12);
 
-                u8 r = note_pitchclass_colors[root][0];
-                u8 g = note_pitchclass_colors[root][1];
-                u8 b = note_pitchclass_colors[root][2];
+            u8 r = note_pitchclass_colors[root][0];
+            u8 g = note_pitchclass_colors[root][1];
+            u8 b = note_pitchclass_colors[root][2];
 
-                rgb_led(B_NOTE, r, g, b);
-            } else {
-                rgb_led(B_NOTE, 0, 0, 0);
-            }
+            rgb_led(B_NOTE, r, g, b);
         }
     }
 
@@ -464,6 +475,10 @@ void note_surface_event(u8 p, u8 v, u8 x, u8 y) {
     } else if (p == B_NOTE && note_shift && v != 0) { // Shift+Note button
         mode_update(mode_scale_setup); // Enter Setup for Scale mode
         rgb_led(p, 63, 63, 63);
+    } else if (p == B_P1 && note_shift && v != 0) { // Shift+Note button
+        settings.scale.note_translate = 1 - settings.scale.note_translate;
+        note_transpose *= settings.scale.note_translate;
+        mode_update(mode_note);
     } else if (p == B_NOTE && v == 0) {
         note_scale_button();
     } else if (y == 9 || (x == 9 && y > 4)) { // Unused side buttons
@@ -484,6 +499,9 @@ void note_surface_event(u8 p, u8 v, u8 x, u8 y) {
     } else if (p == B_STOP) { // Root Shift
         note_root_shift = v;
         note_root_button();
+    } else if (x == 0 && note_shift && v != 0) { // Scale Buttons
+        settings.scale.selected = y + 24 - 1;
+        mode_update(mode_note);
     } else if (x == 0) { // Scale Buttons
         note_root_button();
     } else if (x == 9 && y < 5) { // Navigation buttons
@@ -499,22 +517,42 @@ void note_surface_event(u8 p, u8 v, u8 x, u8 y) {
                         break;
                 }
             } else {
-                switch (p) {
-                    case B_UP: // Octave up
-                        if (note_octave < 8) note_octave++;
-                        break;
+                if (note_shift) {
+                    switch (p) {
+                        case B_UP:
+                            break;
 
-                    case B_DOWN: // Octave down
-                        if (note_octave > -1) note_octave--;
-                        break;
+                        case B_DOWN:
+                            break;
 
-                    case B_LEFT: // Transpose down
-                        if (note_transpose > -12) note_transpose--;
-                        break;
+                        case B_LEFT: // Transpose down
+                            if (note_transpose > -12) note_transpose--;
+                            break;
 
-                    case B_RIGHT: // Transpose up
-                        if (note_transpose < 12) note_transpose++;
-                        break;
+                        case B_RIGHT: // Transpose up
+                            if (note_transpose < 12) note_transpose++;
+                            break;
+                    }
+                } else {
+                    switch (p) {
+                        case B_UP: // Octave up
+                            if (note_octave < 8) note_octave++;
+                            break;
+
+                        case B_DOWN: // Octave down
+                            if (note_octave > -1) note_octave--;
+                            break;
+
+                        case B_LEFT:
+                            settings.scale.root = modulo(settings.scale.root - 1, 12);
+                            note_scale_button();
+                            break;
+
+                        case B_RIGHT:
+                            settings.scale.root = modulo(settings.scale.root + 1, 12);
+                            note_scale_button();
+                            break;
+                    }
                 }
             }
         }
