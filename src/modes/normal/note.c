@@ -77,19 +77,34 @@ const u8 note_scale_colors[12][3] = {
 };
 
 const u8 note_accidental_colors[12][3] = {
-    {0x1f, 0x00, 0x1f}, // unison / octave
-    note_color_black, // minor second
-    note_color_black, // major second
-    {0x04, 0x03, 0x00}, // minor third
-    {0x3f, 0x29, 0x0a}, // major third
-    note_color_black, // perfect fourth
-    note_color_black, // tritone
-    {0x0a, 0x29, 0x3f}, // perfect fifth
-    note_color_black, // minor sixth
-    note_color_black, // major sixth
-    note_color_black, // minor seventh
-    note_color_black // major seventh
+    {0x37 >> 4, 0x00 >> 4, 0x09 >> 4}, // unison / octave
+    {0x37 >> 4, 0x04 >> 4, 0x00 >> 4}, // minor second
+    {0x2b >> 4, 0x18 >> 4, 0x00 >> 4}, // major second
+    {0x24 >> 4, 0x1c >> 4, 0x00 >> 4}, // minor third
+    {0x1b >> 4, 0x20 >> 4, 0x00 >> 4}, // major third
+    {0x00 >> 4, 0x23 >> 4, 0x10 >> 4}, // perfect fourth
+    {0x00 >> 4, 0x22 >> 4, 0x1e >> 4}, // tritone
+    {0x00 >> 4, 0x21 >> 4, 0x25 >> 4}, // perfect fifth
+    {0x00 >> 4, 0x1f >> 4, 0x2e >> 4}, // minor sixth
+    {0x11 >> 4, 0x17 >> 4, 0x3f >> 4}, // major sixth
+    {0x25 >> 4, 0x09 >> 4, 0x3f >> 4}, // minor seventh
+    {0x2c >> 4, 0x00 >> 4, 0x38 >> 4}  // major seventh
 };
+
+// const u8 note_accidental_colors[12][3] = {
+//     {0x1f, 0x00, 0x1f}, // unison / octave
+//     note_color_black, // minor second
+//     note_color_black, // major second
+//     {0x04, 0x03, 0x00}, // minor third
+//     {0x3f, 0x29, 0x0a}, // major third
+//     note_color_black, // perfect fourth
+//     note_color_black, // tritone
+//     {0x0a, 0x29, 0x3f}, // perfect fifth
+//     note_color_black, // minor sixth
+//     note_color_black, // major sixth
+//     note_color_black, // minor seventh
+//     note_color_black // major seventh
+// };
 
 const u8 note_cmajor_colors[12][3] = {
     {0x37, 0x00, 0x09}, // unison / octave
@@ -201,12 +216,7 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                 u8 m = modulo(c, 12); // Note without octave
 
                 if (settings.scale.enabled) {
-                    if (m == 0) {
-                        note_single(&p[0], l, note_color_scale_base_r, note_color_scale_base_g, note_color_scale_base_b);
-                    } else {
-                        note_single(&p[0], l, note_color_scale_r, note_color_scale_g, note_color_scale_b);
-                    }
-
+                    note_single(&p[0], l, note_scale_colors[m][0], note_scale_colors[m][1], note_scale_colors[m][2]);
                 } else {
 
                     if (settings.scale.note_translate) { // Yellow Pad On
@@ -214,6 +224,7 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                         u8 local_m = modulo(12 + m - settings.scale.root, 12); // Move relative to root note
                         if (local_m == 0) { // Base note
                             note_single(&p[0], l, note_scale_colors[local_m][0], note_scale_colors[local_m][1], note_scale_colors[local_m][2]);
+                            note_draw_scale_degree(v, 0, local_m);
                         } else {
                             u8 out_of_scale = 1;
                             for (u8 i = 0; i < scales_length(settings.scale.selected); i++) {
@@ -222,6 +233,7 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                                 if (local_m == s) {
                                     note_single(&p[0], l, note_scale_colors[local_m][0], note_scale_colors[local_m][1], note_scale_colors[local_m][2]);
                                     out_of_scale = 0;
+                                    note_draw_scale_degree(v, i, local_m);
                                     break;
 
                                 } else if (local_m < s) {
@@ -236,6 +248,26 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                     } else { // Absolute Mode: Yellow Pad Off
                         // Previous mode, simple C major colors
                         note_single(&p[0], l, note_cmajor_colors[m][0], note_cmajor_colors[m][1], note_cmajor_colors[m][2]);
+
+                        // Color notes in relation to SCALE, not absolute!
+                        u8 local_m = modulo(12 + m - settings.scale.root, 12); // Move relative to root note
+                        if (local_m == 0) { // Base note
+                            note_draw_scale_degree(v, 0, local_m);
+                        } else {
+                            u8 out_of_scale = 1;
+                            for (u8 i = 0; i < scales_length(settings.scale.selected); i++) {
+                                u8 s = scales(settings.scale.selected, i);
+
+                                if (local_m == s) {
+                                    out_of_scale = 0;
+                                    note_draw_scale_degree(v, i, local_m);
+                                    break;
+
+                                } else if (local_m < s) {
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     // u8 b = modulo(note_transpose, length); // Base note of scale
@@ -246,13 +278,36 @@ s8 note_press(u8 x, u8 y, u8 v, s8 out_p) {
                 if (out_p < 0) {
                     note_single(&p[0], l, note_color_pressed_r, note_color_pressed_g, note_color_pressed_b);
                 } else {
-                    note_single(&p[0], l, palette_value(palette_novation, v, 0), palette_value(palette_novation, v, 1), palette_value(palette_novation, v, 2));
+                    note_single(&p[0], l, note_color_white_r, note_color_white_g, note_color_white_b);
+                }
+
+                u8 m = modulo(c, 12); // Note without octave
+                u8 local_m = modulo(12 + m - settings.scale.root, 12); // Move relative to root note
+                for (u8 i = 0; i < scales_length(settings.scale.selected); i++) {
+                    u8 s = scales(settings.scale.selected, i);
+
+                    if (local_m == s) {
+                        note_draw_scale_degree(v, i, local_m);
+                        break;
+                    } else if (local_m < s) {
+                        break;
+                    }
                 }
             }
         }
     }
 
     return n;
+}
+
+void note_draw_scale_degree(u8 v, u8 deg, u8 interval) {
+    send_midi(2 - mode_default, 0xB0 | note_channel(), 80, deg);
+
+    if (v == 0) {
+        rgb_led(19 + deg * 10, note_accidental_colors[interval][0], note_accidental_colors[interval][1], note_accidental_colors[interval][2]);
+    } else {
+        rgb_led(19 + deg * 10, note_scale_colors[interval][0], note_scale_colors[interval][1], note_scale_colors[interval][2]);
+    }
 }
 
 void note_draw_transpose_view() {
@@ -334,6 +389,8 @@ void note_draw_navigation() {
             rgb_led(94, note_transpose_colors[0][0], note_transpose_colors[0][1], note_transpose_colors[0][2]);
         }
     }
+
+    note_draw_transpose_view();
 }
 
 void note_root_button() {
@@ -427,7 +484,7 @@ void note_surface_event(u8 p, u8 v, u8 x, u8 y) {
     } else if (p == B_STOP) { // Root Shift
         note_root_shift = v;
         note_root_button();
-    } else if (x == 0 && y < 8 && note_root_shift && v != 0) { // Scale Buttons
+    } else if (x == 0) { // Scale Buttons
         note_root_button();
     } else if (x == 9 && y < 5) { // Navigation buttons
         if (v != 0) {
