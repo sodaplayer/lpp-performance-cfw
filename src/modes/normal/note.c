@@ -46,21 +46,6 @@
 #define note_color_white {0x29, 0x29, 0x3f}
 #define note_color_black {0x00, 0x00, 0x00}
 
-const u8 note_pitchclass_colors[12][3] = {
-    {0x37, 0x00, 0x09},
-    {0x37, 0x04, 0x00},
-    {0x2b, 0x18, 0x00},
-    {0x24, 0x1c, 0x00},
-    {0x1b, 0x20, 0x00},
-    {0x00, 0x23, 0x10},
-    {0x00, 0x22, 0x1e},
-    {0x00, 0x21, 0x25},
-    {0x00, 0x1f, 0x2e},
-    {0x11, 0x17, 0x3f},
-    {0x25, 0x09, 0x3f},
-    {0x2c, 0x00, 0x38}
-};
-
 const u8 note_scale_colors[12][3] = {
     {0x37, 0x00, 0x09}, // unison / octave
     {0x37, 0x04, 0x00}, // minor second
@@ -91,20 +76,20 @@ const u8 note_accidental_colors[12][3] = {
     {0x2c >> 4, 0x00 >> 4, 0x38 >> 4}  // major seventh
 };
 
-// const u8 note_accidental_colors[12][3] = {
-//     {0x1f, 0x00, 0x1f}, // unison / octave
-//     note_color_black, // minor second
-//     note_color_black, // major second
-//     {0x04, 0x03, 0x00}, // minor third
-//     {0x3f, 0x29, 0x0a}, // major third
-//     note_color_black, // perfect fourth
-//     note_color_black, // tritone
-//     {0x0a, 0x29, 0x3f}, // perfect fifth
-//     note_color_black, // minor sixth
-//     note_color_black, // major sixth
-//     note_color_black, // minor seventh
-//     note_color_black // major seventh
-// };
+const u8* note_pitchclass_colors[12] = {
+    &note_scale_colors[0],
+    &note_scale_colors[1],
+    &note_scale_colors[2],
+    &note_scale_colors[3],
+    &note_scale_colors[4],
+    &note_scale_colors[5],
+    &note_scale_colors[6],
+    &note_scale_colors[7],
+    &note_scale_colors[8],
+    &note_scale_colors[9],
+    &note_scale_colors[10]
+    &note_scale_colors[11]
+};
 
 const u8 note_cmajor_colors[12][3] = {
     {0x37, 0x00, 0x09}, // unison / octave
@@ -121,7 +106,7 @@ const u8 note_cmajor_colors[12][3] = {
     note_color_white    // major seventh
 };
 
-const u8* major_colors[12] = {
+const u8* major_colors[7] = {
     &note_scale_colors[0],
     &note_scale_colors[2],
     &note_scale_colors[4],
